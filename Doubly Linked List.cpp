@@ -5,16 +5,18 @@ class Node{
 public:
 	int key, data;
 	Node *next;
-	Node():key(0),data(0),next(NULL){}
-	Node(int k,int d):key(k),data(d),next(NULL){}
+	Node *previous;
+
+	Node():key(0),data(0),next(NULL),previous(NULL){}
+	Node(int k,int d):key(k),data(d),next(NULL),previous(NULL){}
 };
 
-class SinglyLinkedList{
+class DoublyLinkedList{
 public:
 	Node *head;
 
-	SinglyLinkedList():head(NULL){}
-	SinglyLinkedList(Node* h):head(NULL){
+	DoublyLinkedList():head(NULL){}
+	DoublyLinkedList(Node* h):head(NULL){
 		head = h; //the first node is the head
 	}
 
@@ -32,9 +34,10 @@ public:
 
 	void appendNode(Node* n){
 		Node* ptr = head;
+		Node* prev = NULL;
 
 		if(nodeExists(n->key)!=NULL){
-			cout<<"Node with key "<<n->key<<" already exists"<<endl;
+			cout<<"Node with key "<<n->key<<" already exists"<<endl<<endl;
 		}else{
 			if(head==NULL){
 				head=n;
@@ -42,21 +45,24 @@ public:
 				while(ptr->next!=NULL){
 					ptr=ptr->next;
 				}
+				prev=ptr;
+				n->previous=prev;
 				ptr->next=n;
 			}
-			cout<<"key data next"<<endl;
-			cout<<n->key<<"   "<<n->data<<"   "<<n->next<<" appended"<<endl<<endl;
+			cout<<"key:"<<n->key<<" "<<"data:"<<n->data<<" "<<"previous:"<<n->previous<<" "<<"next:"<<n->next<<" appended"<<endl<<endl;
 		}
 	}
 
 	void prependNode(Node* n){
+		Node* ptr = head;
+
 		if(nodeExists(n->key)!=NULL){
-			cout<<"Node with key "<<n->key<<" already exists"<<endl;
+			cout<<"Node with key "<<n->key<<" already exists"<<endl<<endl;
 		}else{
+			ptr->previous=n;
 			n->next=head;
 			head=n;
-			cout<<"key data next"<<endl;
-			cout<<n->key<<"   "<<n->data<<"   "<<n->next<<" prepended"<<endl;
+			cout<<"key:"<<ptr->key<<" "<<"data:"<<ptr->data<<" "<<"previous:"<<ptr->previous<<" "<<"next:"<<ptr->next<<" prepend"<<endl<<endl;
 		}
 	}
 
@@ -65,42 +71,56 @@ public:
 		int key = n->key;
 		Node* check = nodeExists(key);
 		Node* temp = NULL;
+		Node* top = head;
+		Node* prev = NULL;
+
 		if(check==NULL){
 			if(ptr==NULL){
-				cout<<"No node with key "<<k<<" exists"<<endl;
-			}else{
+				cout<<"No node with key "<<k<<" exists"<<endl<<endl;
+			}else if(ptr->next!=NULL){
 				temp=ptr;
+				n->previous=temp;
 				ptr=ptr->next;
 				n->next=ptr;
 				temp->next=n;
-				cout<<"key data next"<<endl;
-				cout<<n->key<<"   "<<n->data<<"   "<<n->next<<" inserted between keys "<<temp->key<<" & "<<ptr->key<<endl;
+				ptr->previous=n;
+				cout<<"key:"<<n->key<<" "<<"data:"<<n->data<<" "<<"previous:"<<n->previous<<" "<<"next:"<<n->next<<" inserted between keys "<<temp->key<<" & "<<ptr->key<<endl<<endl;
+			}else if(ptr->next==NULL){
+				cout<<"hello"<<endl;
+				while(top->next!=NULL){
+					top=top->next;
+				}
+				prev=top;
+				n->previous=prev;
+				top->next=n;
+				cout<<"key:"<<n->key<<" "<<"data:"<<n->data<<" "<<"previous:"<<n->previous<<" "<<"next:"<<n->next<<" appended"<<endl<<endl;
 			}
 		}else{
-			cout<<"Node with key "<<n->key<<" already exists"<<endl;
+			cout<<"Node with key "<<n->key<<" already exists"<<endl<<endl;
 		}
 	}
 
 	void updateNode(int k, int val){
 		Node* ptr = nodeExists(k);
+
 		if(ptr!=NULL){
 			ptr->data=val;
-			cout<<"key data next"<<endl;
-			cout<<ptr->key<<"   "<<ptr->data<<"   "<<ptr->next<<" update"<<endl;
+			cout<<"key:"<<ptr->key<<" "<<"data:"<<ptr->data<<" "<<"previous:"<<ptr->previous<<" "<<"next:"<<ptr->next<<" updated"<<endl<<endl;
 		}else{
-			cout<<"No node with key "<<k<<" exists"<<endl;
+			cout<<"No node with key "<<k<<" exists"<<endl<<endl;
 		}
 	}
 
 	void deleteNode(int k){
 		Node *ptr = head;
 		Node *after = NULL;
-		Node *previous = NULL;
+		Node *prev = NULL;
 		Node* current = nodeExists(k);
 
 		if(current!=NULL){
 			if(head->key==k){
 				head=head->next;
+				head->previous=NULL;
 			}else if(current->next==NULL){
 				while(ptr->next!=current){
 					ptr=ptr->next;
@@ -110,33 +130,34 @@ public:
 				while(ptr->next!=current){
 					ptr=ptr->next;
 				}
-				previous=ptr;
+				prev=ptr;
 				after=current->next;
-				previous->next=after;
+				after->previous=prev;
+				prev->next=after;
 			}
-			cout<<"key data next"<<endl;
-			cout<<current->key<<"   "<<current->data<<"   "<<current->next<<" deleted"<<endl;
+			cout<<"key:"<<ptr->key<<" "<<"data:"<<ptr->data<<" "<<"previous:"<<ptr->previous<<" "<<"next:"<<ptr->next<<" deleted"<<endl<<endl;
 		}else{
-			cout<<"No Node with key "<<k<<" exists"<<endl;
+			cout<<"No Node with key "<<k<<" exists"<<endl<<endl;
 		}
 	}
+
 	void displayNodes(){
 		Node* ptr = head;
-		cout<<endl;
-		cout<<"key data next"<<endl;
+		cout<<"head: "<<head<<endl;
+
 		while(ptr->next!=NULL){
-			cout<<ptr->key<<"   "<<ptr->data<<"   "<<ptr->next<<endl;
+			cout<<"key:"<<ptr->key<<" "<<"data:"<<ptr->data<<" "<<"previous:"<<ptr->previous<<" "<<"next:"<<ptr->next<<endl<<endl;
+			//cout<<ptr->key<<" "<<ptr<<endl;
 			ptr=ptr->next;
 		}
 		if(ptr->next==NULL)
-			cout<<ptr->key<<"   "<<ptr->data<<"   "<<ptr->next<<endl;
-		cout<<endl;
+			cout<<"key:"<<ptr->key<<" "<<"data:"<<ptr->data<<" "<<"previous:"<<ptr->previous<<" "<<"next:"<<ptr->next<<endl<<endl;
 	}
 };
 
 int main(){
 
-	SinglyLinkedList s;
+	DoublyLinkedList d;
 	int option, key, data, k1;
 
 	do{
@@ -164,7 +185,7 @@ int main(){
 			cout<<"Enter data: "<<flush;
 			cin>>data;
 			n1->data=data;
-			s.appendNode(n1);
+			d.appendNode(n1);
 			break;
 		case 2:
 			cout<<"Prepend Function Called"<<endl;
@@ -174,7 +195,7 @@ int main(){
 			cout<<"Enter data: "<<flush;
 			cin>>data;
 			n1->data=data;
-			s.prependNode(n1);
+			d.prependNode(n1);
 			break;
 		case 3:
 			cout<<"Insert Function Called"<<endl;
@@ -186,7 +207,7 @@ int main(){
 			cout<<"Enter data: "<<flush;
 			cin>>data;
 			n1->data=data;
-			s.insertAfterNode(k1, n1);
+			d.insertAfterNode(k1, n1);
 			break;
 		case 4:
 			cout<<"Update Function Called"<<endl;
@@ -194,17 +215,17 @@ int main(){
 			cin>>k1;
 			cout<<"Enter data: "<<flush;
 			cin>>data;
-			s.updateNode(k1, data);
+			d.updateNode(k1, data);
 			break;
 		case 5:
 			cout<<"Delete Function Called"<<endl;
 			cout<<"Enter key: "<<flush;
 			cin>>k1;
-			s.deleteNode(k1);
+			d.deleteNode(k1);
 			break;
 		case 6:
 			cout<<"Display Function Called"<<endl;
-			s.displayNodes();
+			d.displayNodes();
 			break;
 		default:
 			cout<<"Enter Proper Number"<<endl;
