@@ -11,41 +11,50 @@ public:
 	Node(int k,int d):key(k),data(d),next(NULL),previous(NULL){}
 };
 
-class DoublyLinkedList{
+class CircularLinkedList{
 public:
 	Node *head;
+	Node *last;
 
-	DoublyLinkedList():head(NULL){}
-	DoublyLinkedList(Node* h):head(NULL){
-		head = h; //the first node is the head
+	CircularLinkedList():head(NULL),last(NULL){}
+	CircularLinkedList(Node* h):head(NULL){
+		head = h; //the first node is the head=
+		last = h;
 	}
 
 	Node* nodeExists(int k){
-		Node* ptr = head;
+		Node* ptr2 = last;
+
 		Node* temp = NULL;
-		while(ptr!=NULL){
-			if(ptr->key==k){
-				temp=ptr;
+		while(ptr2!=NULL){
+			if(ptr2->key==k){
+				temp=ptr2;
 			}
-			ptr=ptr->next;
+			ptr2=ptr2->previous;
 		}
 		return temp;
 	}
 
 	void appendNode(Node* n){
 		Node* ptr = head;
+		Node* ptr2 = last;
 
 		if(nodeExists(n->key)!=NULL){
 			cout<<"Node with key "<<n->key<<" already exists"<<endl<<endl;
 		}else{
 			if(head==NULL){
 				head=n;
-			}else{
-				while(ptr->next!=NULL){
-					ptr=ptr->next;
-				}
-				n->previous=ptr;
+				last=n;
+			}else if(ptr==ptr2){
+				n->previous=head;
 				ptr->next=n;
+				last=n;
+				n->next=head;
+			}else{
+				ptr2->next=n;
+				n->previous=last;
+				last=n;
+				n->next=head;
 			}
 			cout<<"key:"<<n->key<<" data:"<<n->data<<" previous:"<<n->previous<<" next:"<<n->next<<" appended"<<endl<<endl;
 		}
@@ -53,14 +62,16 @@ public:
 
 	void prependNode(Node* n){
 		Node* ptr = head;
+		Node* ptr2 = last;
 
 		if(nodeExists(n->key)!=NULL){
 			cout<<"Node with key "<<n->key<<" already exists"<<endl<<endl;
 		}else{
+			ptr2->next=n;
 			ptr->previous=n;
 			n->next=head;
 			head=n;
-			cout<<"key:"<<ptr->key<<" data:"<<ptr->data<<" previous:"<<ptr->previous<<" next:"<<ptr->next<<" prepend"<<endl<<endl;
+			cout<<"key:"<<n->key<<" data:"<<n->data<<" previous:"<<n->previous<<" next:"<<n->next<<" prepend"<<endl<<endl;
 		}
 	}
 
@@ -68,11 +79,12 @@ public:
 		Node* ptr = nodeExists(k);
 		Node* check = nodeExists(n->key);
 		Node* temp = NULL;
+		Node* ptr2 = last;
 
 		if(check==NULL){
 			if(ptr==NULL){
 				cout<<"No node with key "<<k<<" exists"<<endl<<endl;
-			}else if(ptr->next!=NULL){
+			}else if(ptr!=last){
 				temp=ptr;
 				n->previous=temp;
 				ptr=ptr->next;
@@ -80,9 +92,11 @@ public:
 				temp->next=n;
 				ptr->previous=n;
 				cout<<"key:"<<n->key<<" data:"<<n->data<<" previous:"<<n->previous<<" next:"<<n->next<<" inserted between keys "<<temp->key<<" & "<<ptr->key<<endl<<endl;
-			}else if(ptr->next==NULL){
-				n->previous=ptr;
-				ptr->next=n;
+			}else if(ptr==last){
+				ptr2->next=n;
+				n->previous=last;
+				last=n;
+				n->next=head;
 				cout<<"key:"<<n->key<<" data:"<<n->data<<" previous:"<<n->previous<<" next:"<<n->next<<" appended"<<endl<<endl;
 			}
 		}else{
@@ -110,9 +124,11 @@ public:
 			if(head->key==k){
 				head=head->next;
 				head->previous=NULL;
-			}else if(current->next==NULL){
-				prev=current->previous;
-				prev->next=NULL;
+				last->next=head;
+			}else if(current==last){
+				prev=last->previous;
+				prev->next=head;
+				last=prev;
 			}else{
 				prev=current->previous;
 				after=current->next;
@@ -129,19 +145,19 @@ public:
 		Node* ptr = head;
 		cout<<"head: "<<head<<endl;
 
-		while(ptr->next!=NULL){
+		while(ptr->next!=head){
 			cout<<"key:"<<ptr->key<<" data:"<<ptr->data<<" previous:"<<ptr->previous<<" next:"<<ptr->next<<endl<<endl;
 			//cout<<ptr->key<<" "<<ptr<<endl;
 			ptr=ptr->next;
 		}
-		if(ptr->next==NULL)
+		if(ptr->next==head)
 			cout<<"key:"<<ptr->key<<" data:"<<ptr->data<<" previous:"<<ptr->previous<<" next:"<<ptr->next<<endl<<endl;
 	}
 };
 
 int main(){
 
-	DoublyLinkedList d;
+	CircularLinkedList c;
 	int option, key, data, k1;
 
 	do{
@@ -169,7 +185,7 @@ int main(){
 			cout<<"Enter data: "<<flush;
 			cin>>data;
 			n1->data=data;
-			d.appendNode(n1);
+			c.appendNode(n1);
 			break;
 		case 2:
 			cout<<"Prepend Function Called"<<endl;
@@ -179,7 +195,7 @@ int main(){
 			cout<<"Enter data: "<<flush;
 			cin>>data;
 			n1->data=data;
-			d.prependNode(n1);
+			c.prependNode(n1);
 			break;
 		case 3:
 			cout<<"Insert Function Called"<<endl;
@@ -191,7 +207,7 @@ int main(){
 			cout<<"Enter data: "<<flush;
 			cin>>data;
 			n1->data=data;
-			d.insertAfterNode(k1, n1);
+			c.insertAfterNode(k1, n1);
 			break;
 		case 4:
 			cout<<"Update Function Called"<<endl;
@@ -199,17 +215,23 @@ int main(){
 			cin>>k1;
 			cout<<"Enter data: "<<flush;
 			cin>>data;
-			d.updateNode(k1, data);
+			c.updateNode(k1, data);
 			break;
 		case 5:
 			cout<<"Delete Function Called"<<endl;
 			cout<<"Enter key: "<<flush;
 			cin>>k1;
-			d.deleteNode(k1);
+			c.deleteNode(k1);
 			break;
 		case 6:
 			cout<<"Display Function Called"<<endl;
-			d.displayNodes();
+			c.displayNodes();
+			break;
+		case 7:
+			cout<<"Exist Function Called"<<endl;
+			cout<<"Enter key: "<<flush;
+			cin>>k1;
+			cout<<c.nodeExists(k1)<<endl;
 			break;
 		default:
 			cout<<"Enter Proper Number"<<endl;
