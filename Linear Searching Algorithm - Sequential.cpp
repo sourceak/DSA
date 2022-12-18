@@ -19,8 +19,15 @@ int main(){
 	int arr[5];
 	cout<<"Enter 5 elements for the array"<<endl;
 
-	for(int i=0; i<5; ){
+	for(int i=0; i<5; i++){
+		int z;
+		cin>>z;
+		arr[i]=z;
+	}
 
+	//show array
+	for(int i=0; i<5; i++){
+		cout<<arr[i]<<" "<<flush;
 	}
 
 	cout<<"Enter a value to search"<<endl;
